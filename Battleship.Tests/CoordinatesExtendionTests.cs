@@ -1,6 +1,4 @@
-using Battleship.Core;
 using Battleship.Core.Extensions;
-using Battleship.Core.Models;
 using FluentAssertions;
 using Xunit;
 

@@ -10,11 +10,8 @@ public class ShipBuilderTests
     [Fact]
     public void ShouldBuildBattleship()
     {
-        //Given
-        var shipBuilder = new ShipBuilder();
-
         //When
-        var ship = shipBuilder.Build(ShipType.Battleship);
+        var ship = ShipBuilder.Build(ShipType.Battleship);
 
         //Then
         ship.Size.Should().Be(5);
@@ -23,11 +20,8 @@ public class ShipBuilderTests
     [Fact]
     public void ShouldBuildDestroyer()
     {
-        //Given
-        var shipBuilder = new ShipBuilder();
-
         //When
-        var ship = shipBuilder.Build(ShipType.Destroyer);
+        var ship = ShipBuilder.Build(ShipType.Destroyer);
 
         //Then
         ship.Size.Should().Be(4);

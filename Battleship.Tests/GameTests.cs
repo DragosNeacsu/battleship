@@ -15,15 +15,14 @@ public class GameTests
     public void ShouldThrowWhenTryingToAddShipOutsideTheBoard(int row, int column)
     {
         //Given
-        var board = new BoardBuilder().Create(10, 10);
-        var ship = new ShipBuilder().Build(ShipType.Battleship);
-        var game = new Game();
+        var board = BoardBuilder.Create(10, 10);
+        var ship = ShipBuilder.Build(ShipType.Battleship);
 
         //When
-        Action act = () => game.PlaceShip(board, ship, row, column);
+        Action act = () => Game.PlaceShip(board, ship, row, column);
 
         //Then
-        act.Should().Throw<IndexOutOfRangeException>().WithMessage("Place ship inside the board");
+        act.Should().Throw<IndexOutOfRangeException>().WithMessage("Position outside the board");
     }
 
     [Theory]
@@ -32,12 +31,11 @@ public class GameTests
     public void ShouldThrowWhenTryingToAddShipOnTheBoardEdge(ShipType shipType, int row, int column)
     {
         //Given
-        var board = new BoardBuilder().Create(10, 10);
-        var ship = new ShipBuilder().Build(shipType);
-        var game = new Game();
+        var board = BoardBuilder.Create(10, 10);
+        var ship = ShipBuilder.Build(shipType);
 
         //When
-        Action act = () => game.PlaceShip(board, ship, row, column);
+        Action act = () => Game.PlaceShip(board, ship, row, column);
 
         //Then
         act.Should().Throw<IndexOutOfRangeException>().WithMessage($"Ship will not fit at {row},{column}");
@@ -49,12 +47,11 @@ public class GameTests
     public void ShouldPlaceOneShipOnTheBoard(ShipType shipType, int row, int column)
     {
         //Given
-        var board = new BoardBuilder().Create(10, 10);
-        var ship = new ShipBuilder().Build(shipType);
-        var game = new Game();
+        var board = BoardBuilder.Create(10, 10);
+        var ship = ShipBuilder.Build(shipType);
 
         //When
-        board = game.PlaceShip(board, ship, row, column);
+        board = Game.PlaceShip(board, ship, row, column);
 
         //Then
         ship.Column.Should().Be(column);
@@ -71,16 +68,15 @@ public class GameTests
     public void ShouldPlaceMultipleShipsOnTheBoard()
     {
         //Given
-        var board = new BoardBuilder().Create(10, 10);
-        var battleShip1 = new ShipBuilder().Build(ShipType.Battleship);
-        var battleShip2 = new ShipBuilder().Build(ShipType.Battleship);
-        var destroyer1 = new ShipBuilder().Build(ShipType.Destroyer);
-        var game = new Game();
+        var board = BoardBuilder.Create(10, 10);
+        var battleShip1 = ShipBuilder.Build(ShipType.Battleship);
+        var battleShip2 = ShipBuilder.Build(ShipType.Battleship);
+        var destroyer1 = ShipBuilder.Build(ShipType.Destroyer);
 
         //When
-        board = game.PlaceShip(board, battleShip1, 1, 1);
-        board = game.PlaceShip(board, battleShip2, 2, 1);
-        board = game.PlaceShip(board, destroyer1, 3, 1);
+        board = Game.PlaceShip(board, battleShip1, 1, 1);
+        board = Game.PlaceShip(board, battleShip2, 2, 1);
+        board = Game.PlaceShip(board, destroyer1, 3, 1);
 
         //Then
         board.Cells.Where(c => c.Row == 1 && Enumerable.Range(1, battleShip1.Size).Any(x => x == c.Column)).ToList()
@@ -95,20 +91,19 @@ public class GameTests
     public void ShouldThrowWhenTryingToAddShipOnAnOccupiedCell()
     {
         //Given
-        var board = new BoardBuilder().Create(10, 10);
-        var battleShip1 = new ShipBuilder().Build(ShipType.Battleship);
-        var battleShip2 = new ShipBuilder().Build(ShipType.Battleship);
-        var game = new Game();
+        var board = BoardBuilder.Create(10, 10);
+        var battleShip1 = ShipBuilder.Build(ShipType.Battleship);
+        var battleShip2 = ShipBuilder.Build(ShipType.Battleship);
 
         //When
         Action act = () =>
         {
-            board = game.PlaceShip(board, battleShip1, 1, 1);
-            board = game.PlaceShip(board, battleShip2, 1, 3);
+            board = Game.PlaceShip(board, battleShip1, 1, 1);
+            board = Game.PlaceShip(board, battleShip2, 1, 3);
         };
 
         //Then
-        act.Should().Throw<Exception>().WithMessage("Cant's place ship at this location");
+        act.Should().Throw<Exception>().WithMessage("Can't place ship at this location");
     }
 
     [Theory]
@@ -117,14 +112,13 @@ public class GameTests
     public void ShouldValidateTheAttack(int row, int column)
     {
         //Given
-        var board = new BoardBuilder().Create(10, 10);
-        var game = new Game();
+        var board = BoardBuilder.Create(10, 10);
 
         //When
-        Action act = () => board = game.Attack(board, row, column);
+        Action act = () => board = Game.Attack(board, row, column);
 
         //Then
-        act.Should().Throw<IndexOutOfRangeException>().WithMessage("Attack outside the board");
+        act.Should().Throw<IndexOutOfRangeException>().WithMessage("Position outside the board");
     }
 
 
@@ -132,13 +126,12 @@ public class GameTests
     public void ShouldMarkAnAttackWithHitIfThereWasAShip()
     {
         //Given
-        var board = new BoardBuilder().Create(10, 10);
-        var battleShip = new ShipBuilder().Build(ShipType.Battleship);
-        var game = new Game();
+        var board = BoardBuilder.Create(10, 10);
+        var battleShip = ShipBuilder.Build(ShipType.Battleship);
 
         //When
-        board = game.PlaceShip(board, battleShip, 1, 1);
-        board = game.Attack(board, 1, 2);
+        board = Game.PlaceShip(board, battleShip, 1, 1);
+        board = Game.Attack(board, 1, 2);
 
         //Then
         board.Cells.First(c => c.Row == 1 && c.Column == 2).Status.Should().Be(CellStatus.Hit);
@@ -148,13 +141,12 @@ public class GameTests
     public void ShouldMarkAnAttackWithMissIfThereWasWater()
     {
         //Given
-        var board = new BoardBuilder().Create(10, 10);
-        var battleShip = new ShipBuilder().Build(ShipType.Battleship);
-        var game = new Game();
+        var board = BoardBuilder.Create(10, 10);
+        var battleShip = ShipBuilder.Build(ShipType.Battleship);
 
         //When
-        board = game.PlaceShip(board, battleShip, 1, 1);
-        board = game.Attack(board, 2, 2);
+        board = Game.PlaceShip(board, battleShip, 1, 1);
+        board = Game.Attack(board, 2, 2);
 
         //Then
         board.Cells.First(c => c.Row == 2 && c.Column == 2).Status.Should().Be(CellStatus.Miss);
@@ -164,20 +156,19 @@ public class GameTests
     public void ShouldMarkWithSunkIfTheShipWasDestroyed()
     {
         //Given
-        var board = new BoardBuilder().Create(10, 10);
-        var battleShip = new ShipBuilder().Build(ShipType.Battleship);
-        var game = new Game();
+        var board = BoardBuilder.Create(10, 10);
+        var battleShip = ShipBuilder.Build(ShipType.Battleship);
 
         //When
-        board = game.PlaceShip(board, battleShip, 1, 2);
-        board = game.Attack(board, 1, 1);
-        board = game.Attack(board, 1, 2);
-        board = game.Attack(board, 1, 3);
-        board = game.Attack(board, 2, 3);
-        board = game.Attack(board, 1, 4);
-        board = game.Attack(board, 1, 5);
-        board = game.Attack(board, 1, 6);
-        board = game.Attack(board, 1, 7);
+        board = Game.PlaceShip(board, battleShip, 1, 2);
+        board = Game.Attack(board, 1, 1);
+        board = Game.Attack(board, 1, 2);
+        board = Game.Attack(board, 1, 3);
+        board = Game.Attack(board, 2, 3);
+        board = Game.Attack(board, 1, 4);
+        board = Game.Attack(board, 1, 5);
+        board = Game.Attack(board, 1, 6);
+        board = Game.Attack(board, 1, 7);
 
         //Then
         board.Cells.Where(c => c.Row == 1 && Enumerable.Range(2, battleShip.Size).Any(x => x == c.Column)).ToList()

@@ -14,11 +14,8 @@ public class BoardBuilderTests
     [InlineData(1, 0)]
     public void ShouldThrowErrorWhenInvalidParameters(int rows, int columns)
     {
-        //Given
-        var boardBuilder = new BoardBuilder();
-
         //When
-        Action act = () => boardBuilder.Create(rows, columns);
+        Action act = () => BoardBuilder.Create(rows, columns);
 
         //Then
         act.Should().Throw<ArgumentException>().WithMessage("Invalid board size");
@@ -29,11 +26,8 @@ public class BoardBuilderTests
     [InlineData(10, 10)]
     public void ShouldReturnValidBoardWhenCreatingOne(int rows, int columns)
     {
-        //Given
-        var boardBuilder = new BoardBuilder();
-    
         //When
-        var board = boardBuilder.Create(rows, columns);
+        var board = BoardBuilder.Create(rows, columns);
     
         //Then
         board.Cells.Count.Should().Be(rows * columns);
@@ -44,11 +38,8 @@ public class BoardBuilderTests
     [InlineData(10, 10)]
     public void ShouldMarkEveryCellAsWater(int rows, int columns)
     {
-        //Given
-        var boardBuilder = new BoardBuilder();
-    
         //When
-        var board = boardBuilder.Create(rows, columns);
+        var board = BoardBuilder.Create(rows, columns);
     
         //Then
         foreach (var cell in board.Cells)

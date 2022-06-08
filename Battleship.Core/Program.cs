@@ -5,30 +5,43 @@ using Battleship.Core.Models;
 
 namespace Battleship.Core
 {
-    internal class Program
+    internal static class Program
     {
-        private static int _rowsCount => 10;
-        private static int _columnsCount => 10;
+        private static int RowsCount => 10;
+        private static int ColumnsCount => 10;
 
         static void Main(string[] args)
         {
-            var board = new BoardBuilder().Create(_rowsCount, _columnsCount);
+            var board = BoardBuilder.Create(RowsCount, ColumnsCount);
             var game = new Game();
 
-            var numberOfShips = 5;
-            for (int i = 0; i < numberOfShips; i++)
+            var numberOfShips = 4;
+            for (var i = 0; i < numberOfShips; i++)
             {
-                var ship = new ShipBuilder().Build(RandomExtensions.RandomEnum<ShipType>());
+                var ship = ShipBuilder.Build(RandomExtensions.RandomEnum<ShipType>());
                 board = PlaceShipRandomly(board, ship, game);
             }
 
             DisplayBoard(board);
             var attackPosition = Console.ReadLine();
-            while ((attackPosition != null && attackPosition != "exit") || board.Ships.Any(s => s.Sunk == false))
+            while ((attackPosition != null && attackPosition != "exit"))
             {
-                board = game.Attack(board, CoordinatesExtension.GetRow(attackPosition),
-                    CoordinatesExtension.GetColumn(attackPosition));
-                DisplayBoard(board);
+                try
+                {
+                    board = Game.Attack(board, CoordinatesExtension.GetRow(attackPosition),
+                        CoordinatesExtension.GetColumn(attackPosition));
+                    DisplayBoard(board);
+                    if (board.Ships.All(s => s.Sunk == true))
+                    {
+                        Console.WriteLine("You win!!!");
+                        break;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine(ex.Message);
+                }
+
                 attackPosition = Console.ReadLine();
             }
         }
@@ -63,7 +76,7 @@ namespace Battleship.Core
                         break;
                 }
 
-                if (cell.Column == _columnsCount)
+                if (cell.Column == ColumnsCount)
                 {
                     Console.WriteLine();
                 }
@@ -74,10 +87,11 @@ namespace Battleship.Core
         {
             var columnsCount = board.Cells.Max(c => c.Column);
             var header = " ";
-            for (int i = 1; i <= columnsCount; i++)
+            for (var i = 1; i <= columnsCount; i++)
             {
                 header += $" {Convert.ToChar(i + 64)} ";
             }
+
             Console.WriteLine(header);
         }
 
@@ -86,8 +100,8 @@ namespace Battleship.Core
             var randomGenerator = new Random();
             try
             {
-                return game.PlaceShip(board, ship, randomGenerator.Next(1, _rowsCount + 1),
-                    randomGenerator.Next(1, _columnsCount + 1));
+                return Game.PlaceShip(board, ship, randomGenerator.Next(1, RowsCount + 1),
+                    randomGenerator.Next(1, ColumnsCount + 1));
             }
             catch (Exception)
             {

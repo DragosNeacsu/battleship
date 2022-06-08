@@ -4,7 +4,7 @@ namespace Battleship.Core;
 
 public class Game
 {
-    public Board PlaceShip(Board board, Ship ship, int row, int column)
+    public static Board PlaceShip(Board board, Ship ship, int row, int column)
     {
         TryValidate(board, ship, row, column);
 
@@ -13,7 +13,7 @@ public class Game
 
         if (shipCells.Any(x => x.Status != CellStatus.Water))
         {
-            throw new Exception("Cant's place ship at this location");
+            throw new Exception("Can't place ship at this location");
         }
 
         shipCells.ForEach(c => c.Status = CellStatus.Ship);
@@ -25,15 +25,9 @@ public class Game
         return board;
     }
 
-    public Board Attack(Board board, int row, int column)
+    public static Board Attack(Board board, int row, int column)
     {
-        if (row > board.Cells.Max(c => c.Row) ||
-            row < board.Cells.Min(c => c.Row) ||
-            column > board.Cells.Max(c => c.Column) ||
-            column < board.Cells.Min(c => c.Column))
-        {
-            throw new IndexOutOfRangeException("Attack outside the board");
-        }
+        ValidateInsideBoard(board, row, column);
 
         var cell = board.Cells.First(c => c.Row == row && c.Column == column);
 
@@ -48,7 +42,7 @@ public class Game
         return CheckShip(board, row, column);
     }
 
-    private Board CheckShip(Board board, int row, int column)
+    private static Board CheckShip(Board board, int row, int column)
     {
         foreach (var ship in board.Ships.Where(s => !s.Sunk))
         {
@@ -61,23 +55,27 @@ public class Game
                 shipCells.ForEach(c => c.Status = CellStatus.Sink);
             }
         }
-
         return board;
     }
 
-    private void TryValidate(Board board, Ship ship, int row, int column)
+    private static void TryValidate(Board board, Ship ship, int row, int column)
+    {
+        ValidateInsideBoard(board, row, column);
+
+        if (column + ship.Size > board.Cells.Max(c => c.Column))
+        {
+            throw new IndexOutOfRangeException($"Ship will not fit at {row},{column}");
+        }
+    }
+
+    private static void ValidateInsideBoard(Board board, int row, int column)
     {
         if (row > board.Cells.Max(c => c.Row) ||
             row < board.Cells.Min(c => c.Row) ||
             column > board.Cells.Max(c => c.Column) ||
             column < board.Cells.Min(c => c.Column))
         {
-            throw new IndexOutOfRangeException("Place ship inside the board");
-        }
-
-        if (column + ship.Size > board.Cells.Max(c => c.Column))
-        {
-            throw new IndexOutOfRangeException($"Ship will not fit at {row},{column}");
+            throw new IndexOutOfRangeException("Position outside the board");
         }
     }
 }

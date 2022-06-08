@@ -4,7 +4,7 @@ namespace Battleship.Core;
 
 public class ShipBuilder
 {
-    public Ship Build(ShipType shipType) =>
+    public static Ship Build(ShipType shipType) =>
         shipType switch
         {
             ShipType.Battleship => new Ship(5),
